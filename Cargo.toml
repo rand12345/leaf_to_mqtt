@@ -1,0 +1,96 @@
+[package]
+authors = ["Nobody_Nowhere <63668759+rand12345@users.noreply.github.com>"]
+name = "leaf2json"
+edition = "2021"
+version = "0.1.1"
+
+[lib]
+harness = false
+
+# needed for each integration test
+[[test]]
+name = "integration"
+harness = false
+
+[features]
+default = ["defmt"] 
+defmt = []
+
+
+
+[dependencies]
+nb = "1"
+embedded-hal = "0.2.7"
+cortex-m = { version = "0.7.7",default-features = false, features = ["critical-section-single-core", "linker-plugin-lto"] } 
+cortex-m-rt = "0.7.2"
+defmt = {version = "0.3.2",default-features = false}
+defmt-rtt = "0.4"
+panic-probe = { version = "0.3",default-features = false, features = ["print-defmt"] }
+panic-halt = "0.2"
+
+embassy-sync = { version = "0.1.0",  default-features = false, features = ["defmt"] }
+embassy-executor = { version = "0.1.0",  default-features = false, features = ["defmt", "integrated-timers"] } #
+embassy-time = { version = "0.1.0",  default-features = false, features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+embassy-stm32 = { version = "0.1.0", default-features = false,  features = [ "defmt", "nightly", "stm32f105rb", "unstable-pac", "memory-x", "time-driver-tim3"]  } #
+embassy-futures = { version = "0.1.0" }
+
+embedded-alloc = "0.5.0"
+lazy_static = {version = "1",  default-features = false, features = ["spin_no_std"]}
+miniserde = {version = "0", default-features = false}
+heapless = {version = "0.7.16",  features = ["defmt"]}
+
+[dev-dependencies]
+defmt-test = "0.3"
+
+# cargo build/run
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = 'z'         # <-
+overflow-checks = true  # <-
+
+# cargo test
+[profile.test]
+codegen-units = 1
+debug = 2
+debug-assertions = true # <-
+incremental = false
+opt-level = 3           # <-
+overflow-checks = true  # <-
+
+# cargo build/run --release
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = 3            # <-
+overflow-checks = false  # <-
+# strip = true  # Automatically strip symbols from the binary.
+
+[profile.bench]
+codegen-units = 1
+debug = 2
+debug-assertions = false # <-
+incremental = false
+lto = 'fat'
+opt-level = 3            # <-
+overflow-checks = false  # <-
+
+# uncomment this to switch from the crates.io version of defmt to its git version
+# check app-template's README for instructions
+[patch.crates-io]
+embassy-futures = {git = "https://github.com/embassy-rs/embassy.git"}
+embassy-executor = {git = "https://github.com/embassy-rs/embassy.git"}
+embassy-time = {git = "https://github.com/embassy-rs/embassy.git"}
+embassy-sync = {git = "https://github.com/embassy-rs/embassy.git"}
+embassy-stm32 = {git = "https://github.com/embassy-rs/embassy.git"}
+defmt = { git = "https://github.com/knurling-rs/defmt", tree = "defmt-v0.3.2" }
+defmt-rtt = { git = "https://github.com/knurling-rs/defmt", tree = "defmt-v0.3.2" }
+defmt-test = { git = "https://github.com/knurling-rs/defmt", tree = "defmt-v0.3.2" }
+panic-probe = { git = "https://github.com/knurling-rs/defmt", tree = "defmt-v0.3.2" }
+# serde-json-core = {git = "https://github.com/rust-embedded-community/serde-json-core.git"}
+miniserde = {git = "https://github.com/dtolnay/miniserde.git"}
